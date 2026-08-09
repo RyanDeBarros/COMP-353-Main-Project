@@ -1,320 +1,544 @@
 <?php
+
 require_once("../database.php");
 
+$message = "";
 
-/* CREATE */
+
+/* =========================================================
+   ADD LOCATION
+   ========================================================= */
+
 if (isset($_POST["create"])) {
 
-    $type = $_POST["type"];
-    $name = $_POST["name"];
-    $address = $_POST["address"];
-    $city = $_POST["city"];
-    $province = $_POST["province"];
-    $postalCode = $_POST["postalCode"];
-    $webAddress = $_POST["webAddress"];
-    $maxCapacity = $_POST["maxCapacity"];
-
-
-    $sql = "
-    INSERT INTO Locations
-    (type, name, address, city, province, postalCode, webAddress, maxCapacity)
-    VALUES
-    ('$type','$name','$address','$city','$province','$postalCode','$webAddress','$maxCapacity')
-    ";
-
     try {
-        $conn->query($sql);
+
+        $stmt = $conn->prepare("
+            INSERT INTO Locations
+            (type, name, address, city, province, postalCode,
+             webAddress, maxCapacity)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->bind_param(
+            "sssssssi",
+            $_POST["type"],
+            $_POST["name"],
+            $_POST["address"],
+            $_POST["city"],
+            $_POST["province"],
+            $_POST["postalCode"],
+            $_POST["webAddress"],
+            $_POST["maxCapacity"]
+        );
+
+        $stmt->execute();
+
         $message = "Location created successfully.";
-    }
-    catch (mysqli_sql_exception $e) {
+
+    } catch (Exception $e) {
+
         $message = "Database error: " . $e->getMessage();
-    }
-    catch (Exception $e) {
-        $message = "Error: " . $e->getMessage();
     }
 }
 
 
-/* DELETE */
-if (isset($_POST["delete"])) {
+/* =========================================================
+   UPDATE LOCATION
+   ========================================================= */
 
-    $id = $_POST["id"];
-
-    $sql = "
-    DELETE FROM Locations
-    WHERE id=$id
-    ";
-
-    try {
-        $conn->query($sql);
-        $message = "Location deleted successfully.";
-    }
-    catch (mysqli_sql_exception $e) {
-        $message = "Database error: " . $e->getMessage();
-    }
-    catch (Exception $e) {
-        $message = "Error: " . $e->getMessage();
-    }
-}
-
-
-/* UPDATE */
 if (isset($_POST["update"])) {
 
-    $id = $_POST["id"];
-
-    $type = $_POST["type"];
-    $name = $_POST["name"];
-    $address = $_POST["address"];
-    $city = $_POST["city"];
-    $province = $_POST["province"];
-    $postalCode = $_POST["postalCode"];
-    $webAddress = $_POST["webAddress"];
-    $maxCapacity = $_POST["maxCapacity"];
-
-
-    $sql = "
-    UPDATE Locations SET
-        type='$type',
-        name='$name',
-        address='$address',
-        city='$city',
-        province='$province',
-        postalCode='$postalCode',
-        webAddress='$webAddress',
-        maxCapacity='$maxCapacity'
-    WHERE id=$id
-    ";
-
     try {
-        $conn->query($sql);
+
+        $stmt = $conn->prepare("
+            UPDATE Locations SET
+                type = ?,
+                name = ?,
+                address = ?,
+                city = ?,
+                province = ?,
+                postalCode = ?,
+                webAddress = ?,
+                maxCapacity = ?
+            WHERE id = ?
+        ");
+
+        $stmt->bind_param(
+            "sssssssii",
+            $_POST["type"],
+            $_POST["name"],
+            $_POST["address"],
+            $_POST["city"],
+            $_POST["province"],
+            $_POST["postalCode"],
+            $_POST["webAddress"],
+            $_POST["maxCapacity"],
+            $_POST["id"]
+        );
+
+        $stmt->execute();
+
         $message = "Location updated successfully.";
-    }
-    catch (mysqli_sql_exception $e) {
+
+    } catch (Exception $e) {
+
         $message = "Database error: " . $e->getMessage();
     }
-    catch (Exception $e) {
-        $message = "Error: " . $e->getMessage();
+}
+
+
+/* =========================================================
+   DELETE LOCATION
+   ========================================================= */
+
+if (isset($_POST["delete"])) {
+
+    try {
+
+        $stmt = $conn->prepare("
+            DELETE FROM Locations
+            WHERE id = ?
+        ");
+
+        $stmt->bind_param(
+            "i",
+            $_POST["id"]
+        );
+
+        $stmt->execute();
+
+        $message = "Location deleted successfully.";
+
+    } catch (Exception $e) {
+
+        $message = "Database error: " . $e->getMessage();
+    }
+}
+
+
+/* =========================================================
+   ADD LOCATION PHONE NUMBER
+   ========================================================= */
+
+if (isset($_POST["addPhone"])) {
+
+    try {
+
+        $stmt = $conn->prepare("
+            INSERT INTO LocationPhoneNumbers
+            (locationId, phoneNumber)
+            VALUES (?, ?)
+        ");
+
+        $stmt->bind_param(
+            "is",
+            $_POST["locationId"],
+            $_POST["phoneNumber"]
+        );
+
+        $stmt->execute();
+
+        $message = "Phone number added successfully.";
+
+    } catch (Exception $e) {
+
+        $message = "Database error: " . $e->getMessage();
+    }
+}
+
+
+/* =========================================================
+   DELETE LOCATION PHONE NUMBER
+   ========================================================= */
+
+if (isset($_POST["deletePhone"])) {
+
+    try {
+
+        $stmt = $conn->prepare("
+            DELETE FROM LocationPhoneNumbers
+            WHERE locationId = ?
+            AND phoneNumber = ?
+        ");
+
+        $stmt->bind_param(
+            "is",
+            $_POST["locationId"],
+            $_POST["phoneNumber"]
+        );
+
+        $stmt->execute();
+
+        $message = "Phone number deleted successfully.";
+
+    } catch (Exception $e) {
+
+        $message = "Database error: " . $e->getMessage();
     }
 }
 
 ?>
 
-
 <!DOCTYPE html>
+
 <html>
 
 <head>
-    <title>Manage Locations</title>
-</head>
 
+    <title>Manage Locations</title>
+
+</head>
 
 <body>
 
 <a href="../index.php">Home</a>
 
-<h2>Create Location</h2>
+<h1>Manage Locations</h1>
 
+<?php if (!empty($message)): ?>
+
+    <p>
+        <strong><?= htmlspecialchars($message) ?></strong>
+    </p>
+
+<?php endif; ?>
+
+
+<h2>Create Location</h2>
 
 <form method="post">
 
-Type:
-<select name="type">
-    <option value="Head">Head</option>
-    <option value="Branch">Branch</option>
-</select>
+    Type:
 
-<br>
+    <select name="type">
 
-Name:
-<input type="text" name="name">
+        <option value="Head">Head</option>
+        <option value="Branch">Branch</option>
 
-<br>
+    </select>
 
-Address:
-<input type="text" name="address">
+    <br>
 
-<br>
+    Name:
+    <input type="text" name="name">
 
-City:
-<input type="text" name="city">
+    <br>
 
-<br>
+    Address:
+    <input type="text" name="address">
 
-Province:
-<select name="province">
-    <option>AB</option>
-    <option>BC</option>
-    <option>MB</option>
-    <option>NB</option>
-    <option>NL</option>
-    <option>NS</option>
-    <option>NT</option>
-    <option>NU</option>
-    <option>ON</option>
-    <option>PE</option>
-    <option>QC</option>
-    <option>SK</option>
-    <option>YT</option>
-</select>
+    <br>
 
-<br>
+    City:
+    <input type="text" name="city">
 
-Postal Code:
-<input type="text" name="postalCode">
+    <br>
 
-<br>
+    Province:
 
-Website:
-<input type="text" name="webAddress">
+    <select name="province">
 
-<br>
+        <option>AB</option>
+        <option>BC</option>
+        <option>MB</option>
+        <option>NB</option>
+        <option>NL</option>
+        <option>NS</option>
+        <option>NT</option>
+        <option>NU</option>
+        <option>ON</option>
+        <option>PE</option>
+        <option>QC</option>
+        <option>SK</option>
+        <option>YT</option>
 
-Maximum Capacity:
-<input type="number" name="maxCapacity">
+    </select>
 
-<br><br>
+    <br>
 
-<button name="create">
-Create Location
-</button>
+    Postal Code:
+    <input type="text" name="postalCode">
+
+    <br>
+
+    Website:
+    <input type="text" name="webAddress">
+
+    <br>
+
+    Maximum Capacity:
+    <input type="number" name="maxCapacity">
+
+    <br><br>
+
+    <button name="create">
+        Create Location
+    </button>
 
 </form>
 
 
 <h2>Locations</h2>
 
+<?php
+
+$result = $conn->query("
+    SELECT *
+    FROM Locations
+    ORDER BY name
+");
+
+?>
+
+<table border="1">
+
+<tr>
+
+    <th>ID</th>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Address</th>
+    <th>City</th>
+    <th>Province</th>
+    <th>Postal Code</th>
+    <th>Website</th>
+    <th>Capacity</th>
+    <th>Actions</th>
+
+</tr>
+
+<?php while ($row = $result->fetch_assoc()): ?>
+
+<tr>
+
+<form method="post">
+
+    <td>
+
+        <?= htmlspecialchars($row["id"]) ?>
+
+        <input type="hidden"
+               name="id"
+               value="<?= htmlspecialchars($row["id"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <select name="type">
+
+            <option value="Head"
+                <?= $row["type"] == "Head" ? "selected" : "" ?>>
+                Head
+            </option>
+
+            <option value="Branch"
+                <?= $row["type"] == "Branch" ? "selected" : "" ?>>
+                Branch
+            </option>
+
+        </select>
+
+    </td>
+
+
+    <td>
+
+        <input name="name"
+               value="<?= htmlspecialchars($row["name"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input name="address"
+               value="<?= htmlspecialchars($row["address"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input name="city"
+               value="<?= htmlspecialchars($row["city"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input name="province"
+               value="<?= htmlspecialchars($row["province"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input name="postalCode"
+               value="<?= htmlspecialchars($row["postalCode"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input name="webAddress"
+               value="<?= htmlspecialchars($row["webAddress"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <input type="number"
+               name="maxCapacity"
+               value="<?= htmlspecialchars($row["maxCapacity"]) ?>">
+
+    </td>
+
+
+    <td>
+
+        <button name="update">
+            Save
+        </button>
+
+        <button name="delete"
+                onclick="return confirm('Delete this location?');">
+            Delete
+        </button>
+
+    </td>
+
+</form>
+
+</tr>
+
+<?php endwhile; ?>
+
+</table>
+
+
+<h2>Add Location Phone Number</h2>
+
+<form method="post">
+
+    Location:
+
+    <select name="locationId">
+
+        <?php
+
+        $locations = $conn->query("
+            SELECT id, name
+            FROM Locations
+            ORDER BY name
+        ");
+
+        while ($location = $locations->fetch_assoc()) {
+
+            echo "<option value='{$location["id"]}'>"
+                . htmlspecialchars($location["name"])
+                . "</option>";
+        }
+
+        ?>
+
+    </select>
+
+    <br>
+
+    Phone Number:
+
+    <input type="text"
+           name="phoneNumber"
+           required>
+
+    <br><br>
+
+    <button name="addPhone">
+        Add Phone Number
+    </button>
+
+</form>
+
+
+<h2>Location Phone Numbers</h2>
+
+<table border="1">
+
+<tr>
+
+    <th>Location</th>
+    <th>Phone Number</th>
+    <th>Action</th>
+
+</tr>
 
 <?php
 
-$result = $conn->query("SELECT * FROM Locations");
+$phones = $conn->query("
+    SELECT
+        lpn.locationId,
+        lpn.phoneNumber,
+        l.name AS locationName
 
+    FROM LocationPhoneNumbers lpn
 
-echo "<table border='1'>";
+    JOIN Locations l
+        ON l.id = lpn.locationId
 
-echo "
-<tr>
-<th>ID</th>
-<th>Type</th>
-<th>Name</th>
-<th>Address</th>
-<th>City</th>
-<th>Province</th>
-<th>Postal Code</th>
-<th>Website</th>
-<th>Capacity</th>
-<th>Actions</th>
-</tr>
-";
+    ORDER BY l.name, lpn.phoneNumber
+");
 
-
-while($row = $result->fetch_assoc()) {
-
-
-echo "<tr>";
-
-echo "
-<form method='post'>
-";
-
-
-echo "<td>".$row["id"]."</td>";
-
-
-echo "
-<td>
-<select name='type'>
-<option ".($row["type"]=="Head"?"selected":"").">Head</option>
-<option ".($row["type"]=="Branch"?"selected":"").">Branch</option>
-</select>
-</td>
-";
-
-
-echo "
-<td>
-<input name='name' value='".$row["name"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='address' value='".$row["address"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='city' value='".$row["city"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='province' value='".$row["province"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='postalCode' value='".$row["postalCode"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='webAddress' value='".$row["webAddress"]."'>
-</td>
-";
-
-
-echo "
-<td>
-<input name='maxCapacity' value='".$row["maxCapacity"]."'>
-</td>
-";
-
-
-echo "
-<td>
-
-<input type='hidden' name='id' value='".$row["id"]."'>
-
-<button name='update'>
-Save
-</button>
-
-<button name='delete'
-onclick=\"return confirm('Delete this location?');\">
-Delete
-</button>
-
-</td>
-";
-
-
-echo "</form>";
-
-echo "</tr>";
-
-}
-
-
-echo "</table>";
+while ($phone = $phones->fetch_assoc()):
 
 ?>
+
+<tr>
+
+    <td>
+        <?= htmlspecialchars($phone["locationName"]) ?>
+    </td>
+
+    <td>
+        <?= htmlspecialchars($phone["phoneNumber"]) ?>
+    </td>
+
+    <td>
+
+        <form method="post">
+
+            <input type="hidden"
+                   name="locationId"
+                   value="<?= $phone["locationId"] ?>">
+
+            <input type="hidden"
+                   name="phoneNumber"
+                   value="<?= htmlspecialchars($phone["phoneNumber"]) ?>">
+
+            <button name="deletePhone"
+                    onclick="return confirm('Delete this phone number?');">
+
+                Delete
+
+            </button>
+
+        </form>
+
+    </td>
+
+</tr>
+
+<?php endwhile; ?>
+
+</table>
 
 
 </body>
-</html>
 
-<?php
-if (!empty($message)) {
-    echo "<p><strong>$message</strong></p>";
-}
-?>
+</html>
