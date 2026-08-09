@@ -9,12 +9,19 @@
 
 <h1>Country Soccer Club System</h1>
 
-<h2>Features</h2>
+<h2>DDL Interfaces</h2>
 
 <ul>
-    <li><a href="features/location_interface.php">Location interface</a></li>
+    <li><a href="features/locations_interface.php">Location interface</a></li>
     <li><a href="features/personnel_interface.php">Personnel interface</a></li>
     <li><a href="features/clubmembers_interface.php">Club members interface</a></li>
+    <li><a href="features/familymembers_interface.php">Family members interface</a></li>
+    <li><a href="features/teamformations_interface.php">Team transformations interface</a></li>
+</ul>
+
+<h2>Queries</h2>
+
+<ul>
 </ul>
 
 </body>
