@@ -12,7 +12,8 @@
 <h2>Features</h2>
 
 <ul>
-    <li><a href="queries/location_interface.php">Location interface</a></li>
+    <li><a href="features/location_interface.php">Location interface</a></li>
+    <li><a href="features/personnel_interface.php">Personnel interface</a></li>
 </ul>
 
 </body>
