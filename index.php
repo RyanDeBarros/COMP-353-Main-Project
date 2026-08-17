@@ -33,7 +33,14 @@
             Query 15 - Active goalkeeper-only members
         </a>
     </li>
+    <li>
+        <a href="features/query16.php">
 
+            Query 16 - Members assigned to all five required roles
+
+        </a>
+
+    </li>
     <li>
         <a href="features/send_emails.php">
             Send emails
