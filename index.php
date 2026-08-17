@@ -47,6 +47,11 @@
     </a>
     </li>
     <li>
+    <a href="features/query18.php">
+        Query 18 - Active members who never won a game
+    </a>
+    </li>
+    <li>
         <a href="features/send_emails.php">
             Send emails
         </a>
