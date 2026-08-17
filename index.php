@@ -42,6 +42,11 @@
 
     </li>
     <li>
+    <a href="features/query17.php">
+        Query 17 - Family members who are head coaches
+    </a>
+    </li>
+    <li>
         <a href="features/send_emails.php">
             Send emails
         </a>
