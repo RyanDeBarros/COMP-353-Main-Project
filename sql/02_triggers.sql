@@ -1,5 +1,15 @@
 DELIMITER $$
 
+-- Remove obsolete triggers from the original implementation.
+-- These rules are replaced by the triggers below.
+
+DROP TRIGGER IF EXISTS trg_location_capacity$$
+DROP TRIGGER IF EXISTS trg_personnel_single_location$$
+DROP TRIGGER IF EXISTS trg_no_conflicting_team_assignment$$
+DROP TRIGGER IF EXISTS trg_check_team_formation_player$$
+DROP TRIGGER IF EXISTS trg_check_team_formation_player_location$$
+
+
 
 DROP TRIGGER IF EXISTS trg_session_player_insert$$
 

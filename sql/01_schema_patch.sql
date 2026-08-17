@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS SessionPlayers (
             'Left Fullback',
             'Center Back',
             'Sweeper',
-            'Defending',
+            'Defending Midfielder',
             'Right Midfielder',
             'Central Midfielder',
             'Attacking Midfielder',
@@ -36,28 +36,64 @@ CREATE TABLE IF NOT EXISTS SessionPlayers (
 );
 
 ALTER TABLE TeamSessions
-    MODIFY COLUMN score VARCHAR(50) NULL,
-    ADD COLUMN team1Score INT NULL,
-    ADD COLUMN team2Score INT NULL;
 
-ALTER TABLE TeamSessions
-    ADD CONSTRAINT chk_different_session_teams
-    CHECK (team1 <> team2);
+    MODIFY COLUMN score VARCHAR(50) NULL;
 
-ALTER TABLE TeamSessions
-    ADD CONSTRAINT chk_team1_score
-    CHECK (
-        team1Score IS NULL
-        OR team1Score >= 0
-    );
+SET @sql = (
 
-ALTER TABLE TeamSessions
-    ADD CONSTRAINT chk_team2_score
-    CHECK (
-        team2Score IS NULL
-        OR team2Score >= 0
-    );
+    SELECT IF(
 
+        COUNT(*) = 0,
+
+        'ALTER TABLE TeamSessions ADD COLUMN team1Score INT NULL',
+
+        'SELECT 1'
+
+    )
+
+    FROM information_schema.COLUMNS
+
+    WHERE TABLE_SCHEMA = DATABASE()
+
+      AND TABLE_NAME = 'TeamSessions'
+
+      AND COLUMN_NAME = 'team1Score'
+
+);
+
+PREPARE stmt FROM @sql;
+
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (
+
+    SELECT IF(
+
+        COUNT(*) = 0,
+
+        'ALTER TABLE TeamSessions ADD COLUMN team2Score INT NULL',
+
+        'SELECT 1'
+
+    )
+
+    FROM information_schema.COLUMNS
+
+    WHERE TABLE_SCHEMA = DATABASE()
+
+      AND TABLE_NAME = 'TeamSessions'
+
+      AND COLUMN_NAME = 'team2Score'
+
+);
+
+PREPARE stmt FROM @sql;
+
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;
 CREATE TABLE IF NOT EXISTS FamilyMemberAssociations (
     childId INT NOT NULL,
     familyId INT NOT NULL,
@@ -127,3 +163,40 @@ CREATE TABLE IF NOT EXISTS FamilyMemberLocations (
         FOREIGN KEY (locationId)
         REFERENCES Locations(id)
 );
+
+INSERT INTO FamilyMemberAssociations
+(
+    childId,
+    familyId,
+    startDate,
+    endDate,
+    relationship,
+    familyType
+)
+SELECT
+    fm.childId,
+    fm.familyId,
+    MIN(cmr.startDate) AS startDate,
+    NULL AS endDate,
+    fm.relationship,
+    CASE
+        WHEN fm.relationship IN (
+            'Father',
+            'Mother',
+            'Grandfather',
+            'Grandmother',
+            'Tutor'
+        )
+        THEN 'Primary'
+        ELSE 'Secondary'
+    END AS familyType
+FROM FamilyMembers fm
+JOIN ClubMemberRegistrations cmr
+    ON cmr.memberId = fm.childId
+GROUP BY
+    fm.childId,
+    fm.familyId,
+    fm.relationship
+ON DUPLICATE KEY UPDATE
+    relationship = VALUES(relationship),
+    familyType = VALUES(familyType);
