@@ -22,29 +22,23 @@
 <h2>Queries</h2>
 
 <ul>
-
     <li>
-
         <a href="features/query14.php">
-
             Query 14 - Major members who joined as minors
-
         </a>
-
     </li>
 
     <li>
-
-        <a href="features/send_emails.php">
-
-            Send emails
-
+        <a href="features/query15.php">
+            Query 15 - Active goalkeeper-only members
         </a>
-
     </li>
 
-</ul>
-<ul>
+    <li>
+        <a href="features/send_emails.php">
+            Send emails
+        </a>
+    </li>
 </ul>
 
 </body>
