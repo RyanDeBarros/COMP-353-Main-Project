@@ -20,6 +20,9 @@
 </ul>
 
 <h2>Queries</h2>
+<ul>
+    <li><a href="features/send_emails.php">Send emails</a></li>
+</ul>
 
 <ul>
 </ul>
