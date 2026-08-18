@@ -23,6 +23,20 @@
 
 <ul>
     <li>
+    <a href="features/query7.php">
+        Query 7 - Make a Payment For a Club Member
+    </a>
+    </li>
+    <li>
+    <a href="features/query8.php">
+        Query 8 - Locations with FIFA game participants
+    </a>
+    </li>
+    <li>
+    <a href="features/query9.php">
+        Query 9 - Primary family members with FIFA participants
+    </a>
+    </li>
         <a href="features/query14.php">
             Query 14 - Major members who joined as minors
         </a>
@@ -61,6 +75,21 @@
             Send emails
         </a>
     </li>
+</ul>
+<h2>Bonus Feature</h2>
+
+<ul>
+
+    <li>
+
+        <a href="features/dashboard.php">
+
+            CSCS Management Analytics Dashboard
+
+        </a>
+
+    </li>
+
 </ul>
 
 </body>
